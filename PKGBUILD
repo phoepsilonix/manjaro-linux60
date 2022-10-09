@@ -78,9 +78,13 @@ prepare() {
   for src in "${source[@]}"; do
       src="${src%%::*}"
       src="${src##*/}"
-      [[ $src = *.patch ]] || continue
-      msg2 "Applying patch: $src..."
-      patch -Np1 < "../$src"
+      if [[ $src =~ .*\.patch ]]; then
+              msg2 "Applying patch: $src..."
+              patch -Np1 < "../$src"
+      elif [[ $src =~ .*\.gitpatch ]]; then
+              msg2 "Applying gitpatch: $src..."
+              git --git-dir= apply -p1 --stat --apply "../$src"
+      fi
   done
 
   msg2 "add config"
